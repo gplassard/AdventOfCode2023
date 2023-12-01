@@ -42,4 +42,36 @@ class Day1Test extends AnyWordSpec with Matchers {
     }
   }
 
+  "part2" should {
+    "be 0 for no lines" in {
+      Day1.part2(List.empty) should equal(0)
+    }
+
+    "work for a single line" in {
+      Day1.part2(List("onetwo")) should equal(12)
+    }
+
+    "work with random chars in a single line" in {
+      Day1.part2(List("xsqdssqdqsonekjqhsdkjshqdtwofdsfds")) should equal(12)
+    }
+
+    "work with single char single line" in {
+      Day1.part2(List("one")) should equal(11)
+    }
+
+    "work with multiple lines" in {
+      Day1.part2(List("oneone", "onetwo")) should equal(23)
+    }
+
+    "work for the sample" in {
+      val measures = Files.lines(Paths.get("src/test/resources/day1/sample-2.txt")).toScala(List)
+      Day1.part2(measures) should equal(281)
+    }
+
+    "work for the input" in {
+      val measures = Files.lines(Paths.get("src/test/resources/day1/input.txt")).toScala(List)
+      Day1.part2(measures) should equal(53592)
+    }
+  }
+
 }
