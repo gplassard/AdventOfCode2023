@@ -7,3 +7,8 @@ lazy val root = (project in file("."))
     name := "AdventOfCode2023",
     idePackagePrefix := Some("fr.gplassard.adventofcode")
   )
+
+libraryDependencies ++= Seq(
+  "org.scalactic" %% "scalactic" % "3.2.16",
+  "org.scalatest" %% "scalatest" % "3.2.16" % "test"
+)
