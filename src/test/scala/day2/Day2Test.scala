@@ -34,4 +34,24 @@ class Day2Test extends AnyWordSpec with Matchers {
     }
   }
 
+  "part2" should {
+    "be 0 for no lines" in {
+      Day2.part2(List.empty) should equal(0)
+    }
+
+    "count for a single valid game" in {
+      Day2.part2(List("Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green")) should equal(48)
+    }
+
+    "work for the sample" in {
+      val measures = Files.lines(Paths.get("src/test/resources/day2/sample.txt")).toScala(List)
+      Day2.part2(measures) should equal(2286)
+    }
+
+    "work for the input" in {
+      val measures = Files.lines(Paths.get("src/test/resources/day2/input.txt")).toScala(List)
+      Day2.part2(measures) should equal(83707)
+    }
+  }
+
 }
