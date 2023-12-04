@@ -40,7 +40,13 @@ class Day4Test extends AnyWordSpec with Matchers {
     }
 
     "count if there are winning cards" in {
-      Day4.part2(List("Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53")) should equal(5)
+      Day4.part2(List(
+        "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53",
+        "Card 2: 41 | 42",
+        "Card 3: 41 | 42",
+        "Card 4: 41 | 42",
+        "Card 5: 41 | 42",
+      )) should equal(9)
     }
 
     "be the number of cards if there are no winning cards" in {
@@ -54,7 +60,7 @@ class Day4Test extends AnyWordSpec with Matchers {
 
     "work for the input" in {
       val measures = Files.lines(Paths.get("src/test/resources/day4/input.txt")).toScala(List)
-      Day4.part2(measures) should equal(27845)
+      Day4.part2(measures) should equal(9496801)
     }
   }
 }
