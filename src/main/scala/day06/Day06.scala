@@ -1,8 +1,8 @@
 package fr.gplassard.adventofcode
-package day6
+package day06
 
 
-object Day6 {
+object Day06 {
 
   def computeDistance(waitingTime: Long, totalTime: Long): Long = waitingTime * (totalTime - waitingTime)
 

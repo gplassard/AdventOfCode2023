@@ -1,7 +1,7 @@
 package fr.gplassard.adventofcode
-package day2
+package day02
 
-object Day2 {
+object Day02 {
 
   def part1(lines: List[String]): Int =
     val gameIds = for {

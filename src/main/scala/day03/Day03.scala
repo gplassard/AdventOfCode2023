@@ -1,7 +1,7 @@
 package fr.gplassard.adventofcode
-package day3
+package day03
 
-object Day3 {
+object Day03 {
 
   def part1(lines: List[String]): Int =
     val engineMap2D = lines.map(line => line.toCharArray.toList)

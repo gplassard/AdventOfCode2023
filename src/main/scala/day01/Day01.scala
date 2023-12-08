@@ -1,7 +1,7 @@
 package fr.gplassard.adventofcode
-package day1
+package day01
 
-object Day1 {
+object Day01 {
 
   def part1(lines: List[String]): Int =
     lines.map( word =>

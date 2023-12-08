@@ -1,9 +1,9 @@
 package fr.gplassard.adventofcode
-package day5
+package day05
 
 import scala.collection.mutable.Stack as MStack
 
-object Day5 {
+object Day05 {
 
   object Transformer {
     def parse(line: String): Transformer =
