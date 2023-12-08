@@ -31,13 +31,13 @@ class Day08Test extends AnyWordSpec with Matchers {
   "part2" should {
 
     "work for the sample" in {
-      val measures = Files.lines(Paths.get("src/test/resources/day08/sample.txt")).toScala(List)
-      Day08.part2(measures) should equal(-1)
+      val measures = Files.lines(Paths.get("src/test/resources/day08/sample-3.txt")).toScala(List)
+      Day08.part2(measures) should equal(6)
     }
 
     "work for the input" in {
       val measures = Files.lines(Paths.get("src/test/resources/day08/input.txt")).toScala(List)
-      Day08.part2(measures) should equal(-1)
+      Day08.part2(measures) should equal(BigInt("8811050362409"))
     }
   }
 }
