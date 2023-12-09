@@ -11,7 +11,12 @@ object Day09 {
     serie.last + solveSerie(derivative)
   }
 
-  def part2(lines: List[String]): Int = {
-    -1
+  def part2(lines: List[String]): Int =
+    lines.map(line => solveSeriePart2(line.split(" ").map(_.trim.toInt).toList)).sum
+
+  def solveSeriePart2(serie: List[Int]): Int = {
+    if (serie.forall(_ == 0)) return 0
+    val derivative = serie.tail.zip(serie).map(t => t._1 - t._2)
+    serie.head - solveSeriePart2(derivative)
   }
 }
