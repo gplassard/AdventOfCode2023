@@ -5,15 +5,17 @@ import scala.collection.mutable.{Stack => MStack, Map => MMap}
 
 object Day10 {
   def part1(lines: List[String]): Int = {
-    val startPosition = {
-      val row = lines.zipWithIndex.find(_._1.contains("S")).get._2
-      (row, lines(row).lastIndexOf('S'))
-    }
+    val startPosition = findStartPosition(lines)
     val maze = lines.map(_.toList)
-    cycleLength(startPosition, maze)
+    cycleLength(startPosition, maze)._2
   }
 
-  def cycleLength(startPosition: (Int, Int), maze: List[List[Char]]): Int = {
+  private def findStartPosition(lines: List[String]): (Int, Int) = {
+    val row = lines.zipWithIndex.find(_._1.contains("S")).get._2
+    (row, lines(row).lastIndexOf('S'))
+  }
+
+  def cycleLength(startPosition: (Int, Int), maze: List[List[Char]]): (MMap[(Int, Int), Int], Int) = {
     val startNeighbors = List((0,1), (0,-1), (1,0), (-1,0))
       .map((dr, dc) => (startPosition._1 + dr, startPosition._2 + dc))
       .filter(candidate => findNeighbors(maze, candidate).contains(startPosition))
@@ -33,7 +35,7 @@ object Day10 {
         }
       }
     }
-    dist.values.max
+    (dist, dist.values.max)
   }
 
   def findNeighbors(maze: List[List[Char]], position: (Int, Int)): List[(Int,Int)] = {
@@ -50,6 +52,25 @@ object Day10 {
   }
 
   def part2(lines: List[String]): Int = {
-    -1
+    val dists = cycleLength(findStartPosition(lines), lines.map(_.toList))._1
+    var area = 0
+    for ((row, rowIndex) <- lines.map(_.toList).zipWithIndex) {
+      var inside = false // scan line by line and flip each time we encounter a pipe that switches from inside to outside
+      //var line = List.empty[Char]
+      for ((col, colIndex) <- row.zipWithIndex) {
+        val pipe = col
+        val isOnPipe = dists.contains((rowIndex, colIndex))
+
+        if (isOnPipe && Set('|', '7', 'F', 'S').contains(pipe)) {
+          inside = !inside
+        }
+        if (inside  && !isOnPipe) {
+          area += 1
+        }
+        //line = line appended (if (isOnPipe) col else (if (inside) 'D' else 'O'))
+      }
+      //println(line.mkString)
+    }
+    area
   }
 }
