@@ -7,13 +7,11 @@ object Day13 {
   def part1(lines: List[String]): Int =
     val patterns = preparePatterns(lines)
     patterns
-      .map(_.map(_.toList).toList)
-      .filter(_.nonEmpty)
       .map(findReflection)
       .map((rowsCounts, columnsCounts) => rowsCounts.getOrElse(0) + columnsCounts.getOrElse(0))
       .sum
 
-  private def preparePatterns(lines: List[String]): MList[MList[String]] = {
+  private def preparePatterns(lines: List[String]): List[List[List[Char]]] = {
     var currentList = MList.empty[String]
     val patterns = MList(currentList)
     for {
@@ -28,6 +26,9 @@ object Day13 {
       }
     }
     patterns
+      .map(_.map(_.toList).toList)
+      .filter(_.nonEmpty)
+      .toList
   }
 
   private def findReflection(pattern: List[List[Char]]): (Option[Int], Option[Int]) =
@@ -49,7 +50,34 @@ object Day13 {
         pattern(index - delta) == pattern(index + delta + 1)
       })
 
-  def part2(lines: List[String]): Int = {
-    -1
+  def part2(lines: List[String]): Int =
+    val patterns = preparePatterns(lines)
+    patterns
+      .map(findUnsmudgedReflection)
+      .map(findReflection)
+      .map((rowsCounts, columnsCounts) => rowsCounts.getOrElse(0) + columnsCounts.getOrElse(0))
+      .sum
+
+  def findUnsmudgedReflection(pattern: List[List[Char]]): List[List[Char]] = {
+    val found = (0 until pattern.length - 1).map(index => hasOnlyOneDeltaAndGiveIndex(index, pattern))
+    println(found)
+    assert(found.count(_ != -1) == 1)
+    val delta = found.indexWhere(_ != -1)
+    val rowIndexToUpdate = found(delta)
+    val rowToCopy = pattern(delta + rowIndexToUpdate)
+    pattern.updated(rowIndexToUpdate, rowToCopy)
   }
+
+  private def hasOnlyOneDeltaAndGiveIndex(index: Int, pattern: List[List[Char]]): Int =
+    val max = Math.min(index, (pattern.length) - index - 2)
+    val deltas = (0 to max)
+      .map(delta => {
+        countDifferences(pattern(index - delta), pattern(index + delta + 1))
+      })
+    val zeroDelta = deltas.count(_ == 0)
+    val oneDelta = deltas.count(_ == 1)
+    val hasOnlyOneDelta = oneDelta == 1 && zeroDelta + oneDelta == deltas.size
+    if (hasOnlyOneDelta) deltas.indexOf(1) else -1
+
+  private def countDifferences(as: List[Char], bs: List[Char]) = as.zip(bs).map((a, b) => if (a == b) 0 else 1).sum
 }
