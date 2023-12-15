@@ -50,34 +50,38 @@ object Day13 {
         pattern(index - delta) == pattern(index + delta + 1)
       })
 
+  private def isAlmostReflectionIndex(index: Int, pattern: List[List[Char]]): Boolean =
+    val max = Math.min(index, (pattern.length) - index - 2)
+    (0 to max)
+      .count(delta => {
+        pattern(index - delta) != pattern(index + delta + 1)
+      }) == 1
+
   def part2(lines: List[String]): Int =
     val patterns = preparePatterns(lines)
     patterns
-      .map(findUnsmudgedReflection)
-      .map(findReflection)
+      .map(unsmudged)
       .map((rowsCounts, columnsCounts) => rowsCounts.getOrElse(0) + columnsCounts.getOrElse(0))
       .sum
 
-  def findUnsmudgedReflection(pattern: List[List[Char]]): List[List[Char]] = {
-    val found = (0 until pattern.length - 1).map(index => hasOnlyOneDeltaAndGiveIndex(index, pattern))
-    println(found)
-    assert(found.count(_ != -1) == 1)
-    val delta = found.indexWhere(_ != -1)
-    val rowIndexToUpdate = found(delta)
-    val rowToCopy = pattern(delta + rowIndexToUpdate)
-    pattern.updated(rowIndexToUpdate, rowToCopy)
-  }
+  def unsmudged(pattern: List[List[Char]]): (Option[Int], Option[Int]) = {
+    val row = for {
+      index <- 0 until pattern.length - 1
+      delta <- 0 to Math.min(index, pattern.length - index - 2)
+      if countDifferences(pattern(index - delta), pattern(index + delta + 1)) == 1
+      if isAlmostReflectionIndex(index, pattern)
+    } yield (index + 1) * 100
 
-  private def hasOnlyOneDeltaAndGiveIndex(index: Int, pattern: List[List[Char]]): Int =
-    val max = Math.min(index, (pattern.length) - index - 2)
-    val deltas = (0 to max)
-      .map(delta => {
-        countDifferences(pattern(index - delta), pattern(index + delta + 1))
-      })
-    val zeroDelta = deltas.count(_ == 0)
-    val oneDelta = deltas.count(_ == 1)
-    val hasOnlyOneDelta = oneDelta == 1 && zeroDelta + oneDelta == deltas.size
-    if (hasOnlyOneDelta) deltas.indexOf(1) else -1
+    val rotated = rotate(pattern)
+    val col = for {
+      index <- 0 until rotated.length - 1
+      delta <- 0 to Math.min(index, rotated.length - index - 2)
+      if countDifferences(rotated(index - delta), rotated(index + delta + 1)) == 1
+      if isAlmostReflectionIndex(index, rotate(pattern))
+    } yield index + 1
+
+    (row.headOption, col.headOption)
+  }
 
   private def countDifferences(as: List[Char], bs: List[Char]) = as.zip(bs).map((a, b) => if (a == b) 0 else 1).sum
 }
