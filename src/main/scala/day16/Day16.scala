@@ -14,10 +14,12 @@ object Day16 {
   }
   case class Beam(x: Int, y: Int, direction: Direction)
 
-  def part1(lines: List[String]): Int = {
+  def part1(lines: List[String]): Int = solve(lines, Beam(0, -1, RIGHT))
+
+  def solve(lines: List[String], start: Beam): Int = {
     val grid = lines.map(_.toList)
     val beams = MSet.empty[Beam]
-    val toContinue = MStack(Beam(0, -1, RIGHT))
+    val toContinue = MStack(start)
     while (toContinue.nonEmpty) {
       var beam: Option[Beam] = Some(toContinue.pop())
       while (beam.isDefined && !beams.contains(beam.get)) {
@@ -59,6 +61,11 @@ object Day16 {
   def inBound(tuple: (Int, Int), grid: List[List[Char]]): Boolean = tuple._1 >= 0 && tuple._2 >= 0 && tuple._1 < grid.size && tuple._2 < grid.head.size
 
   def part2(lines: List[String]): Int = {
-    -1
+    val possibleStarts =
+      lines.indices.map(row => Beam(row, -1, RIGHT))
+      ++ lines.indices.map(row => Beam(row, lines.head.length, LEFT))
+      ++ lines.head.indices.map(col => Beam(-1, col, DOWN))
+      ++ lines.head.indices.map(col => Beam(lines.length, col, UP))
+    possibleStarts.map(start => solve(lines, start)).max
   }
 }

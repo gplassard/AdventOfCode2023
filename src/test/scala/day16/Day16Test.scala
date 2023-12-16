@@ -27,12 +27,12 @@ class Day16Test extends AnyWordSpec with Matchers {
 
     "work for the sample" in {
       val measures = Files.lines(Paths.get("src/test/resources/day16/sample.txt")).toScala(List)
-      Day16.part2(measures) should equal(-1)
+      Day16.part2(measures) should equal(51)
     }
 
     "work for the input" in {
       val measures = Files.lines(Paths.get("src/test/resources/day16/input.txt")).toScala(List)
-      Day16.part2(measures) should equal(-1)
+      Day16.part2(measures) should equal(7759)
     }
   }
 }
