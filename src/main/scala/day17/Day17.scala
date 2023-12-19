@@ -1,99 +1,75 @@
 package fr.gplassard.adventofcode
 package day17
 
-import scala.collection.mutable.{Map => MMap, PriorityQueue => MPriorityQueue}
+import day17.Day17.Direction.*
+
+import scala.collection.mutable.{PriorityQueue as MPriorityQueue, Set as MSet}
 
 object Day17 {
-  enum Direction {
-    case CONTINUE, LEFT, RIGHT
+  enum Direction(val deltaRow: Int, val deltaColumn: Int) {
+    case LEFT extends Direction(0, -1)
+    case UP extends Direction(-1, 0)
+    case RIGHT extends Direction(0, 1)
+    case DOWN extends Direction(1, 0)
+
+    def turnLeft(): Direction = Direction.fromOrdinal((Direction.values.length + this.ordinal - 1) % Direction.values.length)
+    def turnRight(): Direction = Direction.fromOrdinal((this.ordinal + 1) % Direction.values.length)
   }
-  case class Position(row: Int, col: Int, previousDirections: List[Direction])
+
+  case class Position(row: Int, col: Int, direction: Direction, countContinue: Int)
 
   def part1(lines: List[String]): Int =
-    djikstra(lines.map(_.toList.map(_.toString).map(Integer.parseInt)))
+    val grid = lines.map(_.toList.map(_.toString).map(Integer.parseInt))
+    computeHeatloss(grid, 0, 3)
 
-  def djikstra(grid: List[List[Int]]): Int = {
-    val start = Position(0, 0, List.empty)
-    val distances = MMap.empty[Position, Int].withDefaultValue(Integer.MAX_VALUE)
-    val predecessors = MMap(start -> start)
-    distances(start) = 0
 
-    implicit val ordering: Ordering[Position] = Ordering.fromLessThan((a,b) => distances(a) > distances(b)) // we always want the lowest value so we have to reverse
-    val toVisit = MPriorityQueue(start)
+  def computeHeatloss(grid: List[List[Int]], minContinue: Int, maxContinue: Int): Int = {
+    implicit val ordering: Ordering[(Position, Int)] = Ordering.by[(Position, Int), Int](_._2).reverse // we always want the lowest value so we have to reverse
+    val seen = MSet.empty[Position]
+    val toVisit = MPriorityQueue(
+      (Position(0, 0, RIGHT, 0), 0),
+      (Position(0, 0, DOWN, 0), 0),
+    )
 
     while (toVisit.nonEmpty) {
-      val node = toVisit.dequeue()
-      val neighbors = findNeighbors(node, predecessors(node), grid)
-      for {neighbor <- neighbors} {
-        val newDist = distances(node) + grid(neighbor.row)(neighbor.col)
-        if (newDist < distances(neighbor)) {
-          distances(neighbor) = newDist
-          predecessors(neighbor) = node
-          toVisit += neighbor
-          if (neighbor.row == grid.length - 1 && neighbor.col == grid.head.length - 1) {
-//            debug(grid, predecessors, neighbor, distances)
-            return distances(neighbor)
-          }
+      val (current, heatloss) = toVisit.dequeue()
+      if (current.row == grid.size - 1 && current.col == grid.head.size - 1 && current.countContinue >= minContinue) {
+        return heatloss
+      }
+      if (!seen.contains(current)) {
+        seen.add(current)
+        val neighbors = findNeighbors(current, grid, minContinue, maxContinue)
+        neighbors.foreach { neighbor =>
+          val delta = if (neighbor.countContinue != 0) grid(neighbor.row)(neighbor.col) else 0
+          toVisit += ((neighbor, heatloss + delta))
         }
       }
     }
     -1
   }
 
-  def debug(grid: List[List[Int]], predecessors: MMap[Position, Position], end: Position, distances: MMap[Position, Int]) = {
-    val simplifiedDistances = distances.groupBy(p => (p._1.row, p._1.col)).map((rowCol, positions) => (rowCol, positions.values.min))
-    val lines = for {
-      row <- grid.indices
-    } yield for {
-      col <- grid(row).indices
-    } yield simplifiedDistances.getOrElse((row, col), 0)
-    lines.foreach(l => println(l.map(i => String.format("%02d", i)).mkString(" ")))
-    var current = end
-    while (current.col != 0 || current.row != 0) {
-      println(s"$current ${distances(current)}")
-      current = predecessors(current)
-    }
-    println(s"$current ${distances(current)}")
+  def findNeighbors(current: Position, grid: List[List[Int]], minContinue: Int, maxContinue: Int): List[Position] = {
+    val left = current.copy(direction = current.direction.turnLeft(), countContinue = 0)
+    val right = current.copy(direction = current.direction.turnRight(), countContinue = 0)
+    val continue = current.copy(
+      row = current.row + current.direction.deltaRow,
+      col = current.col + current.direction.deltaColumn,
+      countContinue = current.countContinue + 1
+    )
+    List(left, right, continue)
+      .filter(n => isInGrid(n, grid))
+      .filter(n => current.countContinue != 0 || current.direction == n.direction)  // don't turn twice in a row
+      .filter(n => current.direction == n.direction || current.countContinue >= minContinue) // don't turn before min distance
+      .filter(n => n.countContinue <= maxContinue)
   }
 
-  def findNeighbors(current: Position, previous: Position, grid: List[List[Int]]): List[Position] = {
-    val direction = findDirection(previous, current)
+  def isInGrid(position: Position, grid: List[List[Int]]): Boolean = position.row >= 0
+    && position.row < grid.size
+    && position.col >= 0
+    && position.col < grid.head.length
 
-    val goLeft: Position = (direction match {
-      case "NORTH" => current.copy(row = current.row, col = current.col - 1)
-      case "EAST"  => current.copy(row = current.row - 1, col = current.col)
-      case "SOUTH" => current.copy(row = current.row, col = current.col + 1)
-      case "WEST"  => current.copy(row = current.row + 1, col = current.col)
-    }).copy(previousDirections = (Direction.LEFT +: current.previousDirections).take(3))
+  def part2(lines: List[String]): Int =
+    val grid = lines.map(_.toList.map(_.toString).map(Integer.parseInt))
+    computeHeatloss(grid, 4, 10)
 
-    val goRight: Position = (direction match {
-      case "NORTH" => current.copy(row = current.row, col = current.col + 1)
-      case "EAST" => current.copy(row = current.row + 1, col = current.col)
-      case "SOUTH" => current.copy(row = current.row, col = current.col - 1)
-      case "WEST" => current.copy(row = current.row - 1, col = current.col)
-    }).copy(previousDirections = (Direction.RIGHT +: current.previousDirections).take(3))
-
-    val continue: Position = (direction match {
-      case "NORTH" => current.copy(row = current.row - 1, col = current.col)
-      case "EAST" => current.copy(row = current.row, col = current.col + 1)
-      case "SOUTH" => current.copy(row = current.row + 1, col = current.col)
-      case "WEST" => current.copy(row = current.row, col = current.col - 1)
-    }).copy(previousDirections = (Direction.CONTINUE +: current.previousDirections).take(3))
-    List(goLeft, goRight, continue)
-      .filter(_.previousDirections != List(Direction.CONTINUE, Direction.CONTINUE, Direction.CONTINUE))
-      .filter(_.row >= 0)
-      .filter(_.row < grid.size)
-      .filter(_.col >= 0)
-      .filter(_.col < grid.head.size)
-  }
-
-  def findDirection(previous: Position, current: Position): String = {
-    if (previous.row == current.row) {
-      if (previous.col > current.col) "WEST" else "EAST"
-    } else {
-      if (previous.row > current.row) "NORTH" else "SOUTH"
-    }
-  }
-
-  def part2(lines: List[String]): Int = -1
 }
