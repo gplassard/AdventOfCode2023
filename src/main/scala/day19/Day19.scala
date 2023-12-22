@@ -2,6 +2,15 @@ package fr.gplassard.adventofcode
 package day19
 
 object Day19 {
+  case class PartRanges(x: Set[Int], m: Set[Int], a: Set[Int], s: Set[Int]) {
+    def hasEmptyRange(): Boolean = x.isEmpty || m.isEmpty || a.isEmpty || s.isEmpty
+    def combinations(): Long = x.size.toLong * m.size.toLong * a.size.toLong * s.size.toLong
+    def filter(attribute: String, predicate:  Int => Boolean): PartRanges = attribute match
+      case "x" => copy(x = x.filter(predicate))
+      case "m" => copy(m = m.filter(predicate))
+      case "a" => copy(a = a.filter(predicate))
+      case "s" => copy(s = s.filter(predicate))
+  }
   object Workflow {
     def parse(line: String): Workflow = {
       val name = line.takeWhile(_ != '{')
@@ -24,16 +33,28 @@ object Day19 {
       else Rule(Default, outcome)
     }
   }
-  case class Rule(condition: Condition, outcome: RuleOutcome)
+  case class Rule(condition: Condition, outcome: RuleOutcome) {
+    def intersect(partRange: PartRanges): PartRanges = condition.intersect(partRange)
+    def subtract(partRange: PartRanges): PartRanges = condition.subtract(partRange)
+  }
 
   trait Condition:
     def accepts(part: Part): Boolean
+    def intersect(partRange: PartRanges): PartRanges
+    def subtract(partRange: PartRanges): PartRanges
   case class GreaterThan(attributeName: String, value: Int) extends Condition:
     override def accepts(part: Part): Boolean = part.attributes.find(_.name == attributeName).get.value > value
+    override def intersect(partRange: PartRanges): PartRanges = partRange.filter(attributeName, _ > value)
+    override def subtract(partRange: PartRanges): PartRanges = partRange.filter(attributeName, _ <= value)
   case class LesserThan(attributeName: String, value: Int) extends Condition:
     override def accepts(part: Part): Boolean = part.attributes.find(_.name == attributeName).get.value < value
+    override def intersect(partRange: PartRanges): PartRanges = partRange.filter(attributeName, _ < value)
+    override def subtract(partRange: PartRanges): PartRanges = partRange.filter(attributeName, _ >= value)
+
   object Default extends Condition:
     override def accepts(part: Part): Boolean = true
+    override def intersect(partRange: PartRanges): PartRanges = partRange.filter("x", _ => true)
+    override def subtract(partRange: PartRanges): PartRanges = partRange.filter("x", _ => false)
 
   trait RuleOutcome
   case object Rejected extends RuleOutcome
@@ -67,7 +88,28 @@ object Day19 {
     currentOutcome == Accepted
   }
 
-  def part2(lines: List[String]): Int = {
-    -1
+  def part2(lines: List[String]): Long = {
+    val workflows = lines.takeWhile(_.nonEmpty).map(Workflow.parse).map(w => w.name -> w).toMap
+    val startRange = PartRanges(Set.from(1 to 4000), Set.from(1 to 4000), Set.from(1 to 4000), Set.from(1 to 4000))
+    walkdown(workflows("in"),startRange, workflows)
+  }
+
+  def walkdown(workflow: Workflow, partRanges: PartRanges, workflows: Map[String, Workflow]): Long = {
+    if (partRanges.hasEmptyRange()) return 0
+    workflow.rules.foldLeft((partRanges, 0L))((acc, rule) => {
+      val (range, acceptedCount) = acc
+      val (remainingRange, accepted) = walkdown(rule, range, workflows)
+      (remainingRange, acceptedCount + accepted)
+    })._2
+  }
+
+  def walkdown(rule: Rule, partRanges: PartRanges, workflows: Map[String, Workflow]): (PartRanges, Long) = {
+    if (partRanges.hasEmptyRange()) return (partRanges, 0L)
+
+    rule.outcome match {
+      case SendTo(workflow) => (rule.subtract(partRanges), walkdown(workflows(workflow), rule.intersect(partRanges), workflows))
+      case Accepted => (rule.subtract(partRanges), rule.intersect(partRanges).combinations())
+      case Rejected => (rule.subtract(partRanges), 0L)
+    }
   }
 }
