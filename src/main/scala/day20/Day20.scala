@@ -42,7 +42,7 @@ object Day20 {
       else (updated, Some(HIGH))
   }
 
-  case class Config(modules: Map[String, Module]) {
+  case class Config(modules: Map[String, Module], predecessors: Map[String, Int] = Map.empty) {
     def initConjuctions(): Config = {
       val conjunctions = modules.values.filter(_.isInstanceOf[Conjunction]).map(_.asInstanceOf[Conjunction]).toList
       conjunctions.foldLeft(this)((config, conjunction) => {
@@ -51,6 +51,9 @@ object Day20 {
           modules = config.modules + (conjunction.name -> conjunction.copy(incoming = inputs.map(i => i -> LOW).toMap))
         )
       })
+    }
+    def initPredecessors(): Config = {
+      this.copy(predecessors = modules.values.filter(m => m.connectedModules.contains("xn")).map(m => m.name -> 0).toMap)
     }
   }
 
@@ -85,12 +88,32 @@ object Day20 {
             }
           }
         }
+        if (signal == HIGH && moduleName == "xn") {
+          updatedConfig = updatedConfig.copy(predecessors = updatedConfig.predecessors.updatedWith(source)(opt => opt.map(_ + 1)))
+        }
       }
     }
     (updatedConfig, pulses(LOW), pulses(HIGH))
   }
 
-  def part2(lines: List[String]): Int = {
-    -1
+  def part2(lines: List[String]): BigInt = {
+    var config = Config(lines.map(Module.parse).map(m => m.name -> m).toMap)
+      .initConjuctions()
+      .initPredecessors()
+    var cycles = Map.from(config.predecessors.keys.map(k => k -> 0))
+    var cycle = 0
+    while (cycles.values.toList.contains(0)) {
+      cycle = cycle + 1
+      val res = push(config.copy(predecessors = config.predecessors.map((k, _) => (k, 0))))
+      config = res._1
+      for {
+        predecessor <- config.predecessors.filter(_._2 == 1).keys
+      } {
+        cycles = cycles.updatedWith(predecessor)(_.filter(_ != 0).orElse(Some(cycle)))
+      }
+    }
+    lcm(cycles.values.toList.map(BigInt(_)))
   }
+
+  def lcm(list: Seq[BigInt]): BigInt = list.foldLeft(1: BigInt) { (a, b) => b * a / LazyList.iterate((a, b)) { case (x, y) => (y, x % y) }.dropWhile(_._2 != 0).head._1.abs }
 }
