@@ -1,7 +1,7 @@
 package fr.gplassard.adventofcode
 package day22
 
-import scala.collection.mutable.{Map => MMap, Set => MSet}
+import scala.collection.mutable.{Map => MMap, Set => MSet, Queue => MQueue}
 
 object Day22 {
   object Brick {
@@ -63,6 +63,33 @@ object Day22 {
   }
 
   def part2(lines: List[String]): Int = {
-    -1
+    val bricks = fall(lines.map(Brick.parse))
+    val (supports, isSupportedBy) = buildSupportRelations(bricks)
+    countDisintegrate(bricks, supports, isSupportedBy)
+  }
+
+
+  def countDisintegrate(bricks: List[Brick], supports: MMap[Int, MSet[Int]], isSupportedBy: MMap[Int, MSet[Int]]): Int = {
+    var count = 0
+    for {
+      brick <- bricks.indices
+    } {
+      val relyingOnBrick = MQueue.from(supports(brick).filter(support => isSupportedBy(support).size == 1))
+      val falling = MSet(brick) ++ relyingOnBrick
+
+      while (relyingOnBrick.nonEmpty) {
+        val current = relyingOnBrick.dequeue()
+        for {
+          support <- supports(current)
+          if (!falling.contains(support))
+          if (isSupportedBy(support).forall(falling.contains))
+        } {
+          relyingOnBrick += support
+          falling += support
+        }
+      }
+      count += falling.size - 1
+    }
+    count
   }
 }
