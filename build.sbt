@@ -17,6 +17,7 @@ lazy val root = (project in file("."))
 
 libraryDependencies ++= Seq(
   "org.matheclipse" % "matheclipse-core" % "3.0.0",
+  "org.jgrapht" % "jgrapht-core" % "1.5.2",
   "org.scalactic" %% "scalactic" % "3.2.16",
   "org.scalatest" %% "scalatest" % "3.2.16" % "test"
 )
