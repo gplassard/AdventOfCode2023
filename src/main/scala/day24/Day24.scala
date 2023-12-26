@@ -1,6 +1,10 @@
 package fr.gplassard.adventofcode
 package day24
 
+import org.matheclipse.core.eval.ExprEvaluator
+import org.matheclipse.core.eval.util.SolveUtils
+import org.matheclipse.core.reflection.system.Solve
+
 object Day24 {
   object HayStack {
     def parse(line: String): HayStack = {
@@ -39,7 +43,16 @@ object Day24 {
     total
   }
 
-  def part2(lines: List[String]): Int = {
-    -1
+  def part2(lines: List[String]): Long = {
+    val hayStacks = lines.map(HayStack.parse)
+    val util = new ExprEvaluator()
+    val equations = hayStacks.take(10).flatMap(h => List(
+      s"(x - ${h.x}) * (${h.vy} - vy) - (y - ${h.y}) * (${h.vx} - vx) == 0",
+      s"(y - ${h.y}) * (${h.vz} - vz) - (z - ${h.z}) * (${h.vy} - vy) == 0",
+    ))
+    val variables = "x,y,z,vx,vy,vz"
+    val res = util.eval(s"Solve({${equations.mkString(",")}},{${variables}})")
+    val values = res.toString.replace("{{", "").replace("}}", "").replace("\n", "").split(",").map(exp => exp.split("->")(0) -> exp.split("->")(1).toLong).toMap
+    values("x") + values("y") + values("z")
   }
 }
