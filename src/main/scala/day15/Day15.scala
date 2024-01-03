@@ -6,7 +6,7 @@ object Day15 {
     lines(0).split(",").map(hash).sum
 
   def hash(text: String): Int =
-    text.foldLeft(0)((value, char) => ((value + char.toInt)  * 17) % 256)
+    text.foldLeft(0)((value, char) => ((value + char.toInt) * 17) % 256)
 
   private type BoxIndex = Int
   private type Label = String
@@ -25,19 +25,24 @@ object Day15 {
           val lenses = previous.getOrElse(List.empty)
           val alreadyPresent = lenses.exists(_._1 == label)
           Some(
-            if (alreadyPresent) lenses.map(lens => if (lens._1 == label) (lens._1, focal) else lens)
+            if (alreadyPresent)
+              lenses.map(lens =>
+                if (lens._1 == label) (lens._1, focal) else lens
+              )
             else lenses :+ (label, focal)
           )
         }
-      }
-      else if (instruction.contains("-")) {
+      } else if (instruction.contains("-")) {
         val label = instruction.reverse.drop(1).reverse
         boxes = boxes.updatedWith(hash(label))(_.map(_.filter(_._1 != label)))
       }
     }
-    boxes
-      .toList
-      .map((boxIndex, box) => (boxIndex + 1) * box.zipWithIndex.map((lens, lensIndex) => (lensIndex + 1) * lens._2).sum)
+    boxes.toList
+      .map((boxIndex, box) =>
+        (boxIndex + 1) * box.zipWithIndex
+          .map((lens, lensIndex) => (lensIndex + 1) * lens._2)
+          .sum
+      )
       .sum
   }
 }

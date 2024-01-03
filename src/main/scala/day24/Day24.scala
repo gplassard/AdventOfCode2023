@@ -8,11 +8,19 @@ import org.matheclipse.core.reflection.system.Solve
 object Day24 {
   object HayStack {
     def parse(line: String): HayStack = {
-      val Array(x, y, z, vx, vy, vz) = line.replace("@", ",").split(",").map(_.trim).map(BigDecimal.apply)
+      val Array(x, y, z, vx, vy, vz) =
+        line.replace("@", ",").split(",").map(_.trim).map(BigDecimal.apply)
       HayStack(x, y, z, vx, vy, vz)
     }
   }
-  case class HayStack(x: BigDecimal, y: BigDecimal, z: BigDecimal, vx:  BigDecimal, vy: BigDecimal, vz: BigDecimal) {
+  case class HayStack(
+      x: BigDecimal,
+      y: BigDecimal,
+      z: BigDecimal,
+      vx: BigDecimal,
+      vy: BigDecimal,
+      vz: BigDecimal
+  ) {
     val a = vy
     val b = -vx
     val c = (vy * x) - (vx * y)
@@ -29,8 +37,11 @@ object Day24 {
     } {
       val x = (h1.c * h2.b - h2.c * h1.b) / (h1.a * h2.b - h2.a * h1.b)
       val y = (h2.c * h1.a - h1.c * h2.a) / (h1.a * h2.b - h2.a * h1.b)
-      val bounds = if (isSample) (7L, 27L) else (200000000000000L, 400000000000000L)
-      if (bounds(0) <= x && x <= bounds(1) && bounds(0) <= y && y <= bounds(1)) {
+      val bounds =
+        if (isSample) (7L, 27L) else (200000000000000L, 400000000000000L)
+      if (
+        bounds(0) <= x && x <= bounds(1) && bounds(0) <= y && y <= bounds(1)
+      ) {
         val futureX1 = (x - h1.x) * h1.vx >= 0
         val futureY1 = (y - h1.y) * h1.vy >= 0
         val futureX2 = (x - h2.x) * h2.vx >= 0
@@ -46,13 +57,23 @@ object Day24 {
   def part2(lines: List[String]): Long = {
     val hayStacks = lines.map(HayStack.parse)
     val util = new ExprEvaluator()
-    val equations = hayStacks.take(10).flatMap(h => List(
-      s"(x - ${h.x}) * (${h.vy} - vy) - (y - ${h.y}) * (${h.vx} - vx) == 0",
-      s"(y - ${h.y}) * (${h.vz} - vz) - (z - ${h.z}) * (${h.vy} - vy) == 0",
-    ))
+    val equations = hayStacks
+      .take(10)
+      .flatMap(h =>
+        List(
+          s"(x - ${h.x}) * (${h.vy} - vy) - (y - ${h.y}) * (${h.vx} - vx) == 0",
+          s"(y - ${h.y}) * (${h.vz} - vz) - (z - ${h.z}) * (${h.vy} - vy) == 0"
+        )
+      )
     val variables = "x,y,z,vx,vy,vz"
     val res = util.eval(s"Solve({${equations.mkString(",")}},{${variables}})")
-    val values = res.toString.replace("{{", "").replace("}}", "").replace("\n", "").split(",").map(exp => exp.split("->")(0) -> exp.split("->")(1).toLong).toMap
+    val values = res.toString
+      .replace("{{", "")
+      .replace("}}", "")
+      .replace("\n", "")
+      .split(",")
+      .map(exp => exp.split("->")(0) -> exp.split("->")(1).toLong)
+      .toMap
     values("x") + values("y") + values("z")
   }
 }

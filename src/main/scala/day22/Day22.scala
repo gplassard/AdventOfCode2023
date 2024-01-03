@@ -6,12 +6,21 @@ import scala.collection.mutable.{Map => MMap, Set => MSet, Queue => MQueue}
 object Day22 {
   object Brick {
     def parse(line: String): Brick = {
-      val Array(x1, y1, z1, x2, y2, z2) = line.replace("~", ",").split(",").map(_.trim.toInt)
+      val Array(x1, y1, z1, x2, y2, z2) =
+        line.replace("~", ",").split(",").map(_.trim.toInt)
       Brick(x1, y1, z1, x2, y2, z2)
     }
   }
-  case class Brick(x1: Int, y1: Int, var z1: Int, x2: Int, y2: Int, var z2: Int) {
-    def intersect(other: Brick): Boolean = Math.max(x1, other.x1) <= Math.min(x2, other.x2)
+  case class Brick(
+      x1: Int,
+      y1: Int,
+      var z1: Int,
+      x2: Int,
+      y2: Int,
+      var z2: Int
+  ) {
+    def intersect(other: Brick): Boolean =
+      Math.max(x1, other.x1) <= Math.min(x2, other.x2)
         && Math.max(y1, other.y1) <= Math.min(y2, other.y2)
   }
 
@@ -40,7 +49,9 @@ object Day22 {
     bricks.sortBy(_.z1)
   }
 
-  def buildSupportRelations(bricks: List[Brick]): (MMap[Int, MSet[Int]], MMap[Int, MSet[Int]]) = {
+  def buildSupportRelations(
+      bricks: List[Brick]
+  ): (MMap[Int, MSet[Int]], MMap[Int, MSet[Int]]) = {
     val supports = MMap.from(bricks.indices.map(i => i -> MSet.empty[Int]))
     val isSupportedBy = MMap.from(bricks.indices.map(i => i -> MSet.empty[Int]))
     for {
@@ -55,7 +66,11 @@ object Day22 {
     (supports, isSupportedBy)
   }
 
-  def count(bricks: List[Brick], supports: MMap[Int, MSet[Int]], isSupportedBy: MMap[Int, MSet[Int]]): Int = {
+  def count(
+      bricks: List[Brick],
+      supports: MMap[Int, MSet[Int]],
+      isSupportedBy: MMap[Int, MSet[Int]]
+  ): Int = {
     bricks.indices.count(i => {
       val supportedByI = supports(i)
       supportedByI.forall(j => isSupportedBy(j).size >= 2)
@@ -68,13 +83,18 @@ object Day22 {
     countDisintegrate(bricks, supports, isSupportedBy)
   }
 
-
-  def countDisintegrate(bricks: List[Brick], supports: MMap[Int, MSet[Int]], isSupportedBy: MMap[Int, MSet[Int]]): Int = {
+  def countDisintegrate(
+      bricks: List[Brick],
+      supports: MMap[Int, MSet[Int]],
+      isSupportedBy: MMap[Int, MSet[Int]]
+  ): Int = {
     var count = 0
     for {
       brick <- bricks.indices
     } {
-      val relyingOnBrick = MQueue.from(supports(brick).filter(support => isSupportedBy(support).size == 1))
+      val relyingOnBrick = MQueue.from(
+        supports(brick).filter(support => isSupportedBy(support).size == 1)
+      )
       val falling = MSet(brick) ++ relyingOnBrick
 
       while (relyingOnBrick.nonEmpty) {

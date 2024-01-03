@@ -21,31 +21,53 @@ object Day05 {
   }
 
   def part1(lines: List[String]): Long =
-    var numbers = lines(0).replace("seeds:", "").split(" ").map(_.trim).filter(_.nonEmpty).map(_.toLong)
+    var numbers = lines(0)
+      .replace("seeds:", "")
+      .split(" ")
+      .map(_.trim)
+      .filter(_.nonEmpty)
+      .map(_.toLong)
     var transformers = List.empty[Transformer]
     for (line <- lines) {
       if (line.isBlank) {
-        numbers = numbers.map(n => transformers.map(t => t.transform(n)).find(_.isDefined).map(_.getOrElse(n)).getOrElse(n))
+        numbers = numbers.map(n =>
+          transformers
+            .map(t => t.transform(n))
+            .find(_.isDefined)
+            .map(_.getOrElse(n))
+            .getOrElse(n)
+        )
         transformers = List.empty
-      }
-      else if (!line.contains(":")) {
+      } else if (!line.contains(":")) {
         transformers = transformers :+ Transformer.parse(line)
       }
     }
-    numbers = numbers.map(n => transformers.map(t => t.transform(n)).find(_.isDefined).map(_.getOrElse(n)).getOrElse(n))
+    numbers = numbers.map(n =>
+      transformers
+        .map(t => t.transform(n))
+        .find(_.isDefined)
+        .map(_.getOrElse(n))
+        .getOrElse(n)
+    )
     numbers.minOption.getOrElse(-1)
 
   case class Range(start: Long, end: Long) {
     def isValid(): Boolean = start <= end
-    def transform(transformer: Transformer): (Option[Range], Option[Range], Option[Range]) = {
+    def transform(
+        transformer: Transformer
+    ): (Option[Range], Option[Range], Option[Range]) = {
       val tStart = transformer.source
       val tEnd = transformer.source + transformer.length
       val delta = transformer.destination - transformer.source
-      val intersectionRange = Some(Range(Math.max(start, tStart), Math.min(end, tEnd))).filter(_.isValid())
-      val belowRange = Some(Range(start, Math.min(end, tStart - 1))).filter(_.isValid())
-      val overRange = Some(Range(Math.max(start, tEnd + 1), end)).filter(_.isValid())
+      val intersectionRange = Some(
+        Range(Math.max(start, tStart), Math.min(end, tEnd))
+      ).filter(_.isValid())
+      val belowRange =
+        Some(Range(start, Math.min(end, tStart - 1))).filter(_.isValid())
+      val overRange =
+        Some(Range(Math.max(start, tEnd + 1), end)).filter(_.isValid())
       (
-        intersectionRange.map(r => Range(r.start  + delta, r.end + delta)),
+        intersectionRange.map(r => Range(r.start + delta, r.end + delta)),
         belowRange,
         overRange
       )
@@ -53,8 +75,18 @@ object Day05 {
   }
 
   def part2(lines: List[String]): Long =
-    val numbers = lines(0).replace("seeds:", "").split(" ").map(_.trim).filter(_.nonEmpty).map(_.toLong)
-    var seeds = MStack.from(numbers.grouped(2).map{case Array(start, length) => Range(start, start + length - 1)}.toList)
+    val numbers = lines(0)
+      .replace("seeds:", "")
+      .split(" ")
+      .map(_.trim)
+      .filter(_.nonEmpty)
+      .map(_.toLong)
+    var seeds = MStack.from(
+      numbers
+        .grouped(2)
+        .map { case Array(start, length) => Range(start, start + length - 1) }
+        .toList
+    )
     var transformers = List.empty[Transformer]
     for (line <- (lines appended "")) {
       if (line.isBlank && transformers.nonEmpty) {
@@ -79,8 +111,9 @@ object Day05 {
         }
         seeds = newSeeds
         transformers = List.empty
-      }
-      else if (!line.contains(":") && !line.contains("seeds") && !line.isBlank) {
+      } else if (
+        !line.contains(":") && !line.contains("seeds") && !line.isBlank
+      ) {
         transformers = transformers :+ Transformer.parse(line)
       }
     }

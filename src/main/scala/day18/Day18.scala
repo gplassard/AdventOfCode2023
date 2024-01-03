@@ -23,10 +23,19 @@ object Day18 {
     val start = PathElement(0, 0)
     val path = instructions.scanLeft(start)((lastPoint, value) => {
       val (direction, delta) = value
-      PathElement(lastPoint.row + direction.deltaRow * delta, lastPoint.col + direction.deltaColumn * delta)
+      PathElement(
+        lastPoint.row + direction.deltaRow * delta,
+        lastPoint.col + direction.deltaColumn * delta
+      )
     })
     val totalPoints = instructions.map(_._2).sum
-    val shoeLace = path.indices.map(i => path(i).row * (path(if (i >= 1) i - 1 else path.length - 1).col - path((i + 1) % path.length).col)).sum / 2
+    val shoeLace = path.indices
+      .map(i =>
+        path(i).row * (path(if (i >= 1) i - 1 else path.length - 1).col - path(
+          (i + 1) % path.length
+        ).col)
+      )
+      .sum / 2
     val abs = if (shoeLace < 0) -shoeLace else shoeLace
     val i = abs - (totalPoints / 2) + 1
     i + totalPoints

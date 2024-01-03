@@ -14,10 +14,10 @@ object Day03 {
       for (col <- 0 until width) {
         val element = engineMap2D(row)(col)
         if (element.isDigit) {
-          hasNeighbor = hasNeighbor || hasPartNeighbor(col, row, engineMap2D, width, height)
+          hasNeighbor =
+            hasNeighbor || hasPartNeighbor(col, row, engineMap2D, width, height)
           currentPartNumber = currentPartNumber + element
-        }
-        else if (currentPartNumber.nonEmpty && hasNeighbor) {
+        } else if (currentPartNumber.nonEmpty && hasNeighbor) {
           sum = sum + currentPartNumber.toInt
         }
         if (!element.isDigit) {
@@ -28,10 +28,24 @@ object Day03 {
     }
     sum
 
-  def hasPartNeighbor(col: Int, row: Int, engineMap2D: List[List[Char]], width: Int, height: Int): Boolean =
-    neighbors(col, row, engineMap2D, width, height).exists((col, row) => isPart(engineMap2D(row)(col)))
+  def hasPartNeighbor(
+      col: Int,
+      row: Int,
+      engineMap2D: List[List[Char]],
+      width: Int,
+      height: Int
+  ): Boolean =
+    neighbors(col, row, engineMap2D, width, height).exists((col, row) =>
+      isPart(engineMap2D(row)(col))
+    )
 
-  def neighbors(col: Int, row: Int, engineMap2D: List[List[Char]], width: Int, height: Int): List[(Int, Int)] = List(
+  def neighbors(
+      col: Int,
+      row: Int,
+      engineMap2D: List[List[Char]],
+      width: Int,
+      height: Int
+  ): List[(Int, Int)] = List(
     (Math.max(col - 1, 0), Math.max(row - 1, 0)),
     (Math.max(col - 1, 0), Math.max(row - 0, 0)),
     (Math.max(col - 1, 0), Math.min(row + 1, height - 1)),
@@ -40,11 +54,10 @@ object Day03 {
     (Math.max(col - 0, 0), Math.min(row + 1, height - 1)),
     (Math.min(col + 1, width - 1), Math.max(row - 1, 0)),
     (Math.min(col + 1, width - 1), Math.max(row - 0, 0)),
-    (Math.min(col + 1, width - 1), Math.min(row + 1, height - 1)),
+    (Math.min(col + 1, width - 1), Math.min(row + 1, height - 1))
   )
 
   def isPart(c: Char): Boolean = c != '.' && !c.isDigit
-
 
   def part2(lines: List[String]): Int =
     val engineMap2D = lines.map(line => line.toCharArray.toList)
@@ -57,12 +70,18 @@ object Day03 {
       for (col <- 0 until width) {
         val element = engineMap2D(row)(col)
         if (element.isDigit) {
-          starNeighbors = starNeighbors ++ getStarNeighborsPositions(col, row, engineMap2D, width, height)
+          starNeighbors = starNeighbors ++ getStarNeighborsPositions(
+            col,
+            row,
+            engineMap2D,
+            width,
+            height
+          )
           currentPartNumber = currentPartNumber + element
-        }
-        else if (currentPartNumber.nonEmpty && starNeighbors.nonEmpty) {
+        } else if (currentPartNumber.nonEmpty && starNeighbors.nonEmpty) {
           for (neighbor <- starNeighbors) {
-            val updatedGear = currentPartNumber.toInt :: gearCandidates.getOrElse(neighbor, List.empty)
+            val updatedGear = currentPartNumber.toInt :: gearCandidates
+              .getOrElse(neighbor, List.empty)
             gearCandidates = gearCandidates + (neighbor -> updatedGear)
           }
         }
@@ -72,13 +91,20 @@ object Day03 {
         }
       }
     }
-    gearCandidates
-      .values
+    gearCandidates.values
       .filter(_.length == 2)
       .map(_.product)
       .sum
 
-  def getStarNeighborsPositions(col: Int, row: Int, engineMap2D: List[List[Char]], width: Int, height: Int): List[(Int, Int)] =
-    neighbors(col, row, engineMap2D, width, height).filter((col, row) => engineMap2D(row)(col) == '*')
+  def getStarNeighborsPositions(
+      col: Int,
+      row: Int,
+      engineMap2D: List[List[Char]],
+      width: Int,
+      height: Int
+  ): List[(Int, Int)] =
+    neighbors(col, row, engineMap2D, width, height).filter((col, row) =>
+      engineMap2D(row)(col) == '*'
+    )
 
 }

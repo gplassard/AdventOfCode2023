@@ -13,12 +13,16 @@ class Day11Test extends AnyWordSpec with Matchers {
   "part1" should {
 
     "work for the sample" in {
-      val measures = Files.lines(Paths.get("src/test/resources/day11/sample.txt")).toScala(List)
+      val measures = Files
+        .lines(Paths.get("src/test/resources/day11/sample.txt"))
+        .toScala(List)
       Day11.part1(measures) should equal(374)
     }
 
     "work for the input" in {
-      val measures = Files.lines(Paths.get("src/test/resources/day11/input.txt")).toScala(List)
+      val measures = Files
+        .lines(Paths.get("src/test/resources/day11/input.txt"))
+        .toScala(List)
       Day11.part1(measures) should equal(9605127)
     }
   }
@@ -26,12 +30,16 @@ class Day11Test extends AnyWordSpec with Matchers {
   "solve" should {
 
     "work for the sample with multiplier 10" in {
-      val measures = Files.lines(Paths.get("src/test/resources/day11/sample.txt")).toScala(List)
+      val measures = Files
+        .lines(Paths.get("src/test/resources/day11/sample.txt"))
+        .toScala(List)
       Day11.solve(measures, BigInt(10)) should equal(1030)
     }
 
     "work for the sample with multiplier 100" in {
-      val measures = Files.lines(Paths.get("src/test/resources/day11/sample.txt")).toScala(List)
+      val measures = Files
+        .lines(Paths.get("src/test/resources/day11/sample.txt"))
+        .toScala(List)
       Day11.solve(measures, BigInt(100)) should equal(8410)
     }
   }
@@ -39,7 +47,9 @@ class Day11Test extends AnyWordSpec with Matchers {
   "part2" should {
 
     "work for the input" in {
-      val measures = Files.lines(Paths.get("src/test/resources/day11/input.txt")).toScala(List)
+      val measures = Files
+        .lines(Paths.get("src/test/resources/day11/input.txt"))
+        .toScala(List)
       Day11.part2(measures) should equal(BigInt(458191688761L))
     }
   }
