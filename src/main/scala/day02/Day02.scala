@@ -15,9 +15,21 @@ object Day02 {
 
   def isValidSet(set: String): Boolean = {
     val reveals = set.split(",")
-    val blues = reveals.filter(_.contains("blue")).map(_.replaceAll("blue", "").trim.toInt).maxOption.getOrElse(0)
-    val reds = reveals.filter(_.contains("red")).map(_.replaceAll("red", "").trim.toInt).maxOption.getOrElse(0)
-    val greens = reveals.filter(_.contains("green")).map(_.replaceAll("green", "").trim.toInt).maxOption.getOrElse(0)
+    val blues = reveals
+      .filter(_.contains("blue"))
+      .map(_.replaceAll("blue", "").trim.toInt)
+      .maxOption
+      .getOrElse(0)
+    val reds = reveals
+      .filter(_.contains("red"))
+      .map(_.replaceAll("red", "").trim.toInt)
+      .maxOption
+      .getOrElse(0)
+    val greens = reveals
+      .filter(_.contains("green"))
+      .map(_.replaceAll("green", "").trim.toInt)
+      .maxOption
+      .getOrElse(0)
     reds <= 12 && greens <= 13 && blues <= 14
   }
 
@@ -26,7 +38,6 @@ object Day02 {
       line <- lines
     } yield gamePower(line.split(":")(1).split(";").toList)
     powers.sum
-
 
   def gamePower(sets: List[String]): Int = {
     val allCubes = sets.map(cubes)
@@ -38,9 +49,21 @@ object Day02 {
 
   def cubes(set: String): (Int, Int, Int) = {
     val reveals = set.split(",")
-    val blues = reveals.filter(_.contains("blue")).map(_.replaceAll("blue", "").trim.toInt).maxOption.getOrElse(0)
-    val reds = reveals.filter(_.contains("red")).map(_.replaceAll("red", "").trim.toInt).maxOption.getOrElse(0)
-    val greens = reveals.filter(_.contains("green")).map(_.replaceAll("green", "").trim.toInt).maxOption.getOrElse(0)
+    val blues = reveals
+      .filter(_.contains("blue"))
+      .map(_.replaceAll("blue", "").trim.toInt)
+      .maxOption
+      .getOrElse(0)
+    val reds = reveals
+      .filter(_.contains("red"))
+      .map(_.replaceAll("red", "").trim.toInt)
+      .maxOption
+      .getOrElse(0)
+    val greens = reveals
+      .filter(_.contains("green"))
+      .map(_.replaceAll("green", "").trim.toInt)
+      .maxOption
+      .getOrElse(0)
     (reds, greens, blues)
   }
 }

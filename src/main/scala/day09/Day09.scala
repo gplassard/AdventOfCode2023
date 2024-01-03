@@ -12,7 +12,9 @@ object Day09 {
   }
 
   def part2(lines: List[String]): Int =
-    lines.map(line => solveSeriePart2(line.split(" ").map(_.trim.toInt).toList)).sum
+    lines
+      .map(line => solveSeriePart2(line.split(" ").map(_.trim.toInt).toList))
+      .sum
 
   def solveSeriePart2(serie: List[Int]): Int = {
     if (serie.forall(_ == 0)) return 0

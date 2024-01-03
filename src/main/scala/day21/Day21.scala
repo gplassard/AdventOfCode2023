@@ -6,14 +6,22 @@ import scala.collection.mutable.{Set => MSet, Queue => MQueue}
 object Day21 {
   def part1(lines: List[String]): Int = {
     val grid = lines.map(_.toCharArray.toList)
-    val start = lines.zipWithIndex.find((l, row) => l.indexOf("S") >= 0).map((l, row) => (row, l.indexOf("S"))).get
+    val start = lines.zipWithIndex
+      .find((l, row) => l.indexOf("S") >= 0)
+      .map((l, row) => (row, l.indexOf("S")))
+      .get
     solve(start, grid, 64)
   }
 
-  def findNeighbors(point: (Int, Int), grid: List[List[Char]]): List[(Int, Int)] =
-    List((0, 1),(0, -1),(1, 0), (-1, 0))
+  def findNeighbors(
+      point: (Int, Int),
+      grid: List[List[Char]]
+  ): List[(Int, Int)] =
+    List((0, 1), (0, -1), (1, 0), (-1, 0))
       .map(delta => (point._1 + delta._1, point._2 + delta._2))
-      .filter(p => p._1 >= 0 && p._1 < grid.length && p._2 >= 0 && p._2 < grid.head.length)
+      .filter(p =>
+        p._1 >= 0 && p._1 < grid.length && p._2 >= 0 && p._2 < grid.head.length
+      )
       .filter(p => grid(p._1)(p._2) != '#')
 
   def solve(start: (Int, Int), grid: List[List[Char]], depth: Int): Int =
@@ -37,7 +45,10 @@ object Day21 {
 
   def part2(lines: List[String]): Long = {
     val grid = lines.map(_.toCharArray.toList)
-    val start = lines.zipWithIndex.find((l, row) => l.indexOf("S") >= 0).map((l, row) => (row, l.indexOf("S"))).get
+    val start = lines.zipWithIndex
+      .find((l, row) => l.indexOf("S") >= 0)
+      .map((l, row) => (row, l.indexOf("S")))
+      .get
     val steps = 26501365
     val size = lines.size
 
@@ -59,12 +70,13 @@ object Day21 {
     val smallSouthWest = solve((0, size - 1), grid, size / 2 - 1).toLong
 
     val bigNorthEast = solve((size - 1, 0), grid, size * 3 / 2 - 1).toLong
-    val bigNorthWest = solve((size - 1, size - 1), grid, size * 3 / 2 - 1).toLong
+    val bigNorthWest =
+      solve((size - 1, size - 1), grid, size * 3 / 2 - 1).toLong
     val bigSouthEast = solve((0, 0), grid, size * 3 / 2 - 1).toLong
     val bigSouthWest = solve((0, size - 1), grid, size * 3 / 2 - 1).toLong
 
     oddGrids * oddGridPoints
-      + evenGrids  * evenGridPoints
+      + evenGrids * evenGridPoints
       + northGrid + eastGrid + southGrid + westGrid
       + (gridWidth + 1) * (smallNorthEast + smallNorthWest + smallSouthEast + smallSouthWest)
       + gridWidth * (bigNorthEast + bigNorthWest + bigSouthEast + bigSouthWest)

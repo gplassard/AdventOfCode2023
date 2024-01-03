@@ -9,9 +9,7 @@ object Day14 {
     computeWeight(board)
 
   private def computeWeight(board: List[List[Char]]): Int =
-    board
-      .reverse
-      .zipWithIndex
+    board.reverse.zipWithIndex
       .map((line, index) => line.count(_ == 'O') * (index + 1))
       .sum
 
@@ -29,7 +27,11 @@ object Day14 {
     }
     mutable.toList.map(_.toList)
 
-  def roundRockRowIndex(board: MList[MList[Char]], column: Int, startRow: Int): Option[Int] =
+  def roundRockRowIndex(
+      board: MList[MList[Char]],
+      column: Int,
+      startRow: Int
+  ): Option[Int] =
     (startRow + 1 until board.length)
       .takeWhile(row => board(row)(column) != '#')
       .find(row => (board(row)(column) == 'O'))
@@ -49,11 +51,20 @@ object Day14 {
       hashes += board.hashCode()
       board = cycle(board)
     }
-    val startOfRecycling = boards.map(_.hashCode()).indexWhere(_ == board.hashCode())
+    val startOfRecycling =
+      boards.map(_.hashCode()).indexWhere(_ == board.hashCode())
     val recyclingLength = boards.length - startOfRecycling
-    computeWeight(boards.drop(startOfRecycling)((1000000000 - startOfRecycling) % recyclingLength))
+    computeWeight(
+      boards.drop(startOfRecycling)(
+        (1000000000 - startOfRecycling) % recyclingLength
+      )
+    )
   }
 
   def cycle(board: List[List[Char]]): List[List[Char]] =
-    rotate(tiltToNorth(rotate(tiltToNorth(rotate(tiltToNorth(rotate(tiltToNorth(board))))))))
+    rotate(
+      tiltToNorth(
+        rotate(tiltToNorth(rotate(tiltToNorth(rotate(tiltToNorth(board))))))
+      )
+    )
 }

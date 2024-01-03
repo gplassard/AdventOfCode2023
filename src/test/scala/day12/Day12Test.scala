@@ -24,66 +24,82 @@ class Day12Test extends AnyWordSpec with Matchers {
       Day12.Record("........".toList, List.empty).count() should equal(1)
     }
     "count remaining solution is valid with errors" in {
-      Day12.Record("##..#..###..".toList, List(2,1,3)).count() should equal(1)
+      Day12.Record("##..#..###..".toList, List(2, 1, 3)).count() should equal(1)
     }
     "count remaining solution with unknown" in {
-      Day12.Record("?#..#..###..".toList, List(2,1,3)).count() should equal(1)
+      Day12.Record("?#..#..###..".toList, List(2, 1, 3)).count() should equal(1)
     }
     "count remaining solution with more unknown" in {
-      Day12.Record("?#?.#..###..".toList, List(2,1,3)).count() should equal(2)
+      Day12.Record("?#?.#..###..".toList, List(2, 1, 3)).count() should equal(2)
     }
     "count from sample" in {
-      Day12.Record("#.#.###".toList, List(1,1,3)).count() should equal(1)
+      Day12.Record("#.#.###".toList, List(1, 1, 3)).count() should equal(1)
     }
     "count from sample - 2.1" in {
-      Day12.Record("???.###".toList, List(1,1,3)).count() should equal(1)
+      Day12.Record("???.###".toList, List(1, 1, 3)).count() should equal(1)
     }
     "count from sample - 2.2" in {
-      Day12.Record(".??..??...?##.".toList, List(1,1,3)).count() should equal(4)
+      Day12.Record(".??..??...?##.".toList, List(1, 1, 3)).count() should equal(
+        4
+      )
     }
     "count from sample - 2.3" in {
-      Day12.Record("?#?#?#?#?#?#?#?".toList, List(1,3, 1, 6)).count() should equal(1)
+      Day12
+        .Record("?#?#?#?#?#?#?#?".toList, List(1, 3, 1, 6))
+        .count() should equal(1)
     }
     "count from sample - 2.4" in {
-      Day12.Record("????.#...#...".toList, List(4,1,1)).count() should equal(1)
+      Day12.Record("????.#...#...".toList, List(4, 1, 1)).count() should equal(
+        1
+      )
     }
     "count from sample - 2.5" in {
-      Day12.Record("????.######..#####.".toList, List(1,6,5)).count() should equal(4)
+      Day12
+        .Record("????.######..#####.".toList, List(1, 6, 5))
+        .count() should equal(4)
     }
     "count from sample - 2.6" in {
-      Day12.Record("?###????????".toList, List(3,2,1)).count() should equal(10)
+      Day12.Record("?###????????".toList, List(3, 2, 1)).count() should equal(
+        10
+      )
     }
     "count from sample - 2.6 - sub 1" in {
-      Day12.Record(".??????".toList, List(2,1)).count() should equal(6)
+      Day12.Record(".??????".toList, List(2, 1)).count() should equal(6)
     }
     "count from sample - 2.6 - sub 2" in {
-      Day12.Record(".?????".toList, List(2,1)).count() should equal(3)
+      Day12.Record(".?????".toList, List(2, 1)).count() should equal(3)
     }
     "count from sample - 2.6 - sub 3" in {
-      Day12.Record(".????".toList, List(2,1)).count() should equal(1)
+      Day12.Record(".????".toList, List(2, 1)).count() should equal(1)
     }
     "count from sample - 2.6 - sub 4" in {
-      Day12.Record(".???".toList, List(2,1)).count() should equal(0)
+      Day12.Record(".???".toList, List(2, 1)).count() should equal(0)
     }
     "count from sample - 2.6 - sub 5" in {
-      Day12.Record("#?".toList, List(2,1)).count() should equal(0)
+      Day12.Record("#?".toList, List(2, 1)).count() should equal(0)
     }
   }
 
   "part1" should {
 
     "work for the sample" in {
-      val measures = Files.lines(Paths.get("src/test/resources/day12/sample.txt")).toScala(List)
+      val measures = Files
+        .lines(Paths.get("src/test/resources/day12/sample.txt"))
+        .toScala(List)
       Day12.part1(measures) should equal(6)
     }
 
     "work for the sample 2" in {
-      val measures = Files.lines(Paths.get("src/test/resources/day12/sample-2.txt")).toScala(List)
+      val measures = Files
+        .lines(Paths.get("src/test/resources/day12/sample-2.txt"))
+        .toScala(List)
       Day12.part1(measures) should equal(21)
     }
 
     "work for the input" in {
-      val measures = Files.lines(Paths.get("src/test/resources/day12/input.txt")).toScala(List)
+      val measures = Files
+        .lines(Paths.get("src/test/resources/day12/input.txt"))
+        .toScala(List)
       Day12.part1(measures) should equal(6827)
     }
   }
@@ -91,7 +107,9 @@ class Day12Test extends AnyWordSpec with Matchers {
   "part2" should {
 
     "work for the sample" in {
-      val measures = Files.lines(Paths.get("src/test/resources/day12/sample-2.txt")).toScala(List)
+      val measures = Files
+        .lines(Paths.get("src/test/resources/day12/sample-2.txt"))
+        .toScala(List)
       Day12.part2(measures) should equal(525152)
     }
 
@@ -120,7 +138,9 @@ class Day12Test extends AnyWordSpec with Matchers {
     }
 
     "work for the input" in {
-      val measures = Files.lines(Paths.get("src/test/resources/day12/input.txt")).toScala(List)
+      val measures = Files
+        .lines(Paths.get("src/test/resources/day12/input.txt"))
+        .toScala(List)
       Day12.part2(measures) should equal(BigInt(1537505634471L))
     }
   }

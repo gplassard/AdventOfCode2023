@@ -15,10 +15,15 @@ object Day10 {
     (row, lines(row).lastIndexOf('S'))
   }
 
-  def cycleLength(startPosition: (Int, Int), maze: List[List[Char]]): (MMap[(Int, Int), Int], Int) = {
-    val startNeighbors = List((0,1), (0,-1), (1,0), (-1,0))
+  def cycleLength(
+      startPosition: (Int, Int),
+      maze: List[List[Char]]
+  ): (MMap[(Int, Int), Int], Int) = {
+    val startNeighbors = List((0, 1), (0, -1), (1, 0), (-1, 0))
       .map((dr, dc) => (startPosition._1 + dr, startPosition._2 + dc))
-      .filter(candidate => findNeighbors(maze, candidate).contains(startPosition))
+      .filter(candidate =>
+        findNeighbors(maze, candidate).contains(startPosition)
+      )
 
     val stack = MStack(startPosition)
     val dist = MMap(
@@ -27,7 +32,8 @@ object Day10 {
 
     while (stack.nonEmpty) {
       val node = stack.pop
-      val neighbors = if (node == startPosition) startNeighbors else findNeighbors(maze, node)
+      val neighbors =
+        if (node == startPosition) startNeighbors else findNeighbors(maze, node)
       for (neighbor <- neighbors) {
         if (!dist.contains(neighbor)) {
           dist.update(neighbor, dist(node) + 1)
@@ -38,7 +44,10 @@ object Day10 {
     (dist, dist.values.max)
   }
 
-  def findNeighbors(maze: List[List[Char]], position: (Int, Int)): List[(Int,Int)] = {
+  def findNeighbors(
+      maze: List[List[Char]],
+      position: (Int, Int)
+  ): List[(Int, Int)] = {
     val (row, column) = position
     maze(position._1)(position._2) match {
       case '|' => List((row - 1, column), (row + 1, column))
@@ -55,8 +64,9 @@ object Day10 {
     val dists = cycleLength(findStartPosition(lines), lines.map(_.toList))._1
     var area = 0
     for ((row, rowIndex) <- lines.map(_.toList).zipWithIndex) {
-      var inside = false // scan line by line and flip each time we encounter a pipe that switches from inside to outside
-      //var line = List.empty[Char]
+      var inside =
+        false // scan line by line and flip each time we encounter a pipe that switches from inside to outside
+      // var line = List.empty[Char]
       for ((col, colIndex) <- row.zipWithIndex) {
         val pipe = col
         val isOnPipe = dists.contains((rowIndex, colIndex))
@@ -64,12 +74,12 @@ object Day10 {
         if (isOnPipe && Set('|', '7', 'F', 'S').contains(pipe)) {
           inside = !inside
         }
-        if (inside  && !isOnPipe) {
+        if (inside && !isOnPipe) {
           area += 1
         }
-        //line = line appended (if (isOnPipe) col else (if (inside) 'D' else 'O'))
+        // line = line appended (if (isOnPipe) col else (if (inside) 'D' else 'O'))
       }
-      //println(line.mkString)
+      // println(line.mkString)
     }
     area
   }
